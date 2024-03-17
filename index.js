@@ -5,16 +5,15 @@ const {
 	IntentsBitField: { Flags },
 } = require("discord.js");
 const dotenv = require("dotenv");
-const { isAdmin } = require("./utils/members");
-
 dotenv.config({ path: ".env" });
 
-const { TOKEN, MAX_PEOPLE, TIME_PER_PICK_IN_SECONDS, ROUNDS } = process.env;
+const { isAdmin } = require("./utils/members");
+const { startDraft } = require("./utils/startDraft");
+const { endDraft } = require("./utils/endDraft");
 
-let users, intervalTask, lastUserIndex;
+const { TOKEN } = process.env;
 
-let rounds = 1;
-let currentUserIndex = 0;
+// console.log(process.env);
 
 const client = new Client({
 	intents: [
@@ -36,38 +35,18 @@ client.on(Events.MessageCreate, async (message) => {
 			content,
 			member,
 			mentions: { parsedUsers },
-			channel,
 		} = message;
-
-		isAdmin(member);
 
 		const [prefix] = content.split(" ");
 
-		// console.log(message.mentions.members);
-		console.log(parsedUsers.keys());
+		if (!["!startDraft", "!endDraft"].includes(prefix)) return;
 
-		if (prefix !== "!startDraft" || parsedUsers.size > MAX_PEOPLE) return;
+		await isAdmin(member);
 
-		await message.reply(`Starting in ${TIME_PER_PICK_IN_SECONDS} seconds.`);
-
-		users = [...parsedUsers.keys()];
-		lastUserIndex = users.length - 1;
-
-		intervalTask = setInterval(async () => {
-			if (rounds > ROUNDS) return clearInterval(intervalTask);
-			await channel.send(`Its a pick for ${users[currentUserIndex]}`);
-
-			if (currentUserIndex === lastUserIndex) {
-				currentUserIndex = 0;
-				rounds++;
-				users.reverse();
-				return;
-			}
-
-			currentUserIndex++;
-			//
-		}, TIME_PER_PICK_IN_SECONDS * 1000);
+		if (prefix === "!startDraft") await startDraft(message, parsedUsers);
+		if (prefix === "!endDraft") await endDraft();
 	} catch (error) {
+		await message.reply(`Err! \`${error.message}.\``);
 		console.log(error);
 	}
 });
