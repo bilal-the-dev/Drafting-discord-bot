@@ -13,8 +13,6 @@ const { endDraft } = require("./utils/endDraft");
 
 const { TOKEN } = process.env;
 
-// console.log(process.env);
-
 const client = new Client({
 	intents: [
 		Flags.Guilds,

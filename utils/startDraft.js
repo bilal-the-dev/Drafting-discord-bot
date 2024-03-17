@@ -18,8 +18,6 @@ const startDraft = async function (message, parsedUsers) {
 
 	await isWithinLimit(parsedUsers);
 
-	// await message.reply(`Starting in ${TIME_PER_PICK_IN_SECONDS} seconds.`);
-
 	data.isDraftOngoing = true;
 
 	users = [...parsedUsers.values()];
@@ -46,7 +44,9 @@ const startDraft = async function (message, parsedUsers) {
 			return;
 		}
 
-		const reply = `Current pick: ${users[data.currentUserIndex]}`;
+		const reply = `Team #${data.currentUserIndex + 1} ${
+			users[data.currentUserIndex]
+		}`;
 
 		await message.channel.send(reply);
 
