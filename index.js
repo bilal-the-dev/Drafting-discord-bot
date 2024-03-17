@@ -35,6 +35,7 @@ client.on(Events.MessageCreate, async (message) => {
 			content,
 			member,
 			mentions: { parsedUsers },
+			channel,
 		} = message;
 
 		const [prefix] = content.split(" ");
@@ -44,7 +45,7 @@ client.on(Events.MessageCreate, async (message) => {
 		await isAdmin(member);
 
 		if (prefix === "!startDraft") await startDraft(message, parsedUsers);
-		if (prefix === "!endDraft") await endDraft();
+		if (prefix === "!endDraft") await endDraft(channel);
 	} catch (error) {
 		await message.reply(`Err! \`${error.message}.\``);
 		console.log(error);

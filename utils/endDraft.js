@@ -1,4 +1,4 @@
-const endDraft = async function () {
+const endDraft = async function (channel) {
 	const { data } = require("./startDraft");
 
 	if (!data.isDraftOngoing) throw new Error("No draft is ongoing right now");
@@ -6,6 +6,8 @@ const endDraft = async function () {
 	clearInterval(data.intervalTask);
 	data.isDraftOngoing = false;
 	data.rounds = 1;
+
+	await channel.send("Ended the draft successfully.");
 };
 
 module.exports = { endDraft };

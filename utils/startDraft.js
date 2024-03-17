@@ -27,7 +27,7 @@ const startDraft = async function (message, parsedUsers) {
 	data.lastUserIndex = users.length - 1;
 
 	data.intervalTask = setInterval(async () => {
-		if (data.rounds > ROUNDS) return await endDraft();
+		if (data.rounds > ROUNDS) return await endDraft(message.channel);
 		await message.channel.send(`Current pick: ${users[currentUserIndex]}`);
 
 		if (currentUserIndex === data.lastUserIndex) {
