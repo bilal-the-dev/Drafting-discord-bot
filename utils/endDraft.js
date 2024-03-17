@@ -6,6 +6,7 @@ const endDraft = async function (channel) {
 	clearInterval(data.intervalTask);
 	data.isDraftOngoing = false;
 	data.rounds = 1;
+	data.currentUserIndex = 0;
 
 	await channel.send("Ended the draft successfully.");
 };

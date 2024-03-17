@@ -5,12 +5,11 @@ let users;
 
 const data = {
 	isDraftOngoing: false,
-	lastUserIndex: 0,
-	intervalTask: null,
 	rounds: 1,
+	lastUserIndex: 0,
+	currentUserIndex: 0,
+	intervalTask: null,
 };
-
-let currentUserIndex = 0;
 
 const { TIME_PER_PICK_IN_SECONDS, ROUNDS } = process.env;
 
@@ -19,25 +18,39 @@ const startDraft = async function (message, parsedUsers) {
 
 	await isWithinLimit(parsedUsers);
 
-	await message.reply(`Starting in ${TIME_PER_PICK_IN_SECONDS} seconds.`);
+	// await message.reply(`Starting in ${TIME_PER_PICK_IN_SECONDS} seconds.`);
 
 	data.isDraftOngoing = true;
 
 	users = [...parsedUsers.values()];
+	console.log(users.length);
 	data.lastUserIndex = users.length - 1;
 
-	data.intervalTask = setInterval(async () => {
-		if (data.rounds > ROUNDS) return await endDraft(message.channel);
-		await message.channel.send(`Current pick: ${users[currentUserIndex]}`);
+	intervalFunction();
 
-		if (currentUserIndex === data.lastUserIndex) {
-			currentUserIndex = 0;
+	data.intervalTask = setInterval(
+		intervalFunction,
+		TIME_PER_PICK_IN_SECONDS * 1000,
+	);
+
+	async function intervalFunction() {
+		if (data.rounds > ROUNDS) return await endDraft(message.channel);
+
+		if (data.currentUserIndex > data.lastUserIndex) {
+			if (data.rounds < ROUNDS)
+				await message.channel.send("Reversing the order!");
+			data.currentUserIndex = 0;
 			data.rounds++;
+
 			users.reverse();
 			return;
 		}
 
-		currentUserIndex++;
-	}, TIME_PER_PICK_IN_SECONDS * 1000);
+		const reply = `Current pick: ${users[data.currentUserIndex]}`;
+
+		await message.channel.send(reply);
+
+		data.currentUserIndex++;
+	}
 };
 module.exports = { startDraft, data };
